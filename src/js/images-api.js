@@ -1,14 +1,48 @@
-const BASE_URL = 'https://pixabay.com/api/';
-const API_KEY = '28704942-6968b84373f0d7bd37bb26e4e';
+export default class FetchSearchImages {
+  #BASE_URL = 'https://pixabay.com/api/';
+  #API_KEY = '28704942-6968b84373f0d7bd37bb26e4e';
+  constructor() {
+    this.searchQuery = '';
+    this.page = 1;
+    this.dataPerPage = 40;
+    this.totalHits = null;
+  }
 
-export const fetchSearchImages = query => {
-  return fetch(
-    `${BASE_URL}?key=${API_KEY}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true`
-  ).then(response => {
-    if (!response.ok) {
-      throw new Error(response.status);
-    }
+  fetchSearchImages() {
+    console.log('До запроса ', this);
+    const searchParam = new URLSearchParams({
+      image_type: this.photo,
+      orientation: this.horizontal,
+      safesearch: this.true,
+      per_page: this.dataPerPage,
+    });
+    return fetch(
+      `${this.#BASE_URL}?key=${this.#API_KEY}&q=${
+        this.searchQuery
+      }&${searchParam}&page=${this.page}`
+    ).then(response => {
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+      this.incrementPage();
+      console.log('После запроса ', this);
+      return response.json();
+    });
+  }
+  incrementPage() {
+    this.page += 1;
+  }
+  resetPage() {
+    this.page = 1;
+  }
+  isNextDataExsist() {
+    return (this.page - 1) * this.dataPerPage <= this.totalHits;
+  }
 
-    return response.json();
-  });
-};
+  get query() {
+    return this.searchQuery;
+  }
+  set query(newquery) {
+    this.searchQuery = newquery;
+  }
+}

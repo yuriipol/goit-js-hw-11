@@ -1,12 +1,18 @@
 .search-form {
+  position: sticky;
+  top: 0;
   background-color: aqua;
 }
 .gallery {
   display: flex;
   flex-wrap: wrap;
-  align-content: center;
+  justify-content: center;
 }
+// .photo-card {
+// }
 .photo-card:not(last-child) {
   margin-right: 10px;
-  // width: 400px;
+}
+.is-hidden {
+  display: none;
 }
