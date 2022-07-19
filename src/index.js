@@ -20,7 +20,7 @@ const libraryLithBox = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 
-function onSearchFormSubmit(event) {
+async function onSearchFormSubmit(event) {
   event.preventDefault();
   loadMore.classList.add('is-hidden');
 
@@ -28,33 +28,31 @@ function onSearchFormSubmit(event) {
 
   fetchSearch.resetPage();
 
-  fetchSearch
-    .fetchSearchImages()
-    .then(data => {
-      console.log(data);
+  try {
+    const data = await fetchSearch.fetchSearchImages();
+    if (data.hits.length === 0) {
+      gallary.innerHTML = '';
+      loadMore.classList.add('is-hidden');
+      event.target.reset();
+      Notiflix.Notify.warning(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
 
-      if (data.hits.length === 0) {
-        gallary.innerHTML = '';
-        loadMore.classList.add('is-hidden');
-        event.target.reset();
-        Notiflix.Notify.warning(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-        return;
-      }
+    let totalHits = data.totalHits;
+    Notiflix.Notify.info(`Hooray! We found ${totalHits} images`);
 
-      let totalHits = data.totalHits;
-      Notiflix.Notify.info(`Hooray! We found ${totalHits} images`);
+    if (fetchSearch.totalHits === null) {
+      fetchSearch.totalHits = data.totalHits;
+    }
+    gallary.innerHTML = templateCard(data.hits);
 
-      if (fetchSearch.totalHits === null) {
-        fetchSearch.totalHits = data.totalHits;
-      }
-      gallary.innerHTML = templateCard(data.hits);
-
-      libraryLithBox.refresh();
-      loadMore.classList.remove('is-hidden');
-    })
-    .catch(error => console.log(error));
+    libraryLithBox.refresh();
+    loadMore.classList.remove('is-hidden');
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function renderCards(data) {
@@ -74,20 +72,21 @@ function smoothScroll() {
   });
 }
 
-function onClickLoadMore(event) {
-  if (!fetchSearch.isNextDataExsist()) {
-    Notiflix.Notify.info(
-      "We're sorry, but you've reached the end of search results"
-    );
+async function onClickLoadMore(event) {
+  try {
+    if (!fetchSearch.isNextDataExsist()) {
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results"
+      );
 
-    loadMore.classList.add('is-hidden');
-    return;
-  }
+      loadMore.classList.add('is-hidden');
+      return;
+    }
 
-  fetchSearch.fetchSearchImages().then(data => {
-    console.log(data);
-
+    const data = await fetchSearch.fetchSearchImages();
     renderCards(data.hits);
     smoothScroll();
-  });
+  } catch (error) {
+    console.log(error);
+  }
 }

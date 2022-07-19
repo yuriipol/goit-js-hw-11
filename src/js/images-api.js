@@ -8,7 +8,7 @@ export default class FetchSearchImages {
     this.totalHits = null;
   }
 
-  fetchSearchImages() {
+  async fetchSearchImages() {
     console.log('До запроса ', this);
     const searchParam = new URLSearchParams({
       image_type: this.photo,
@@ -16,18 +16,19 @@ export default class FetchSearchImages {
       safesearch: this.true,
       per_page: this.dataPerPage,
     });
-    return fetch(
+
+    const response = await fetch(
       `${this.#BASE_URL}?key=${this.#API_KEY}&q=${
         this.searchQuery
       }&${searchParam}&page=${this.page}`
-    ).then(response => {
-      if (!response.ok) {
-        throw new Error(response.status);
-      }
-      this.incrementPage();
-      console.log('После запроса ', this);
-      return response.json();
-    });
+    );
+    if (!response.ok) {
+      throw new Error(response.status);
+    }
+
+    this.incrementPage();
+
+    return await response.json();
   }
   incrementPage() {
     this.page += 1;
