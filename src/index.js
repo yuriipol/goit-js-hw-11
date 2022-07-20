@@ -2,8 +2,6 @@ import Notiflix from 'notiflix';
 import templateCard from './templates/card.hbs';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-
-import templateCard from './templates/card.hbs';
 import FetchSearchImages from './js/images-api';
 
 const searchForm = document.querySelector('#search-form');
@@ -29,8 +27,10 @@ async function onSearchFormSubmit(event) {
   fetchSearch.resetPage();
 
   try {
-    const data = await fetchSearch.fetchSearchImages();
-    if (data.hits.length === 0) {
+    const response = await fetchSearch.fetchSearchImages();
+    console.log(response);
+
+    if (response.data.hits.length === 0) {
       gallary.innerHTML = '';
       loadMore.classList.add('is-hidden');
       event.target.reset();
@@ -40,13 +40,13 @@ async function onSearchFormSubmit(event) {
       return;
     }
 
-    let totalHits = data.totalHits;
+    let totalHits = response.data.totalHits;
     Notiflix.Notify.info(`Hooray! We found ${totalHits} images`);
 
     if (fetchSearch.totalHits === null) {
-      fetchSearch.totalHits = data.totalHits;
+      fetchSearch.totalHits = response.data.totalHits;
     }
-    gallary.innerHTML = templateCard(data.hits);
+    gallary.innerHTML = templateCard(response.data.hits);
 
     libraryLithBox.refresh();
     loadMore.classList.remove('is-hidden');
@@ -83,8 +83,8 @@ async function onClickLoadMore(event) {
       return;
     }
 
-    const data = await fetchSearch.fetchSearchImages();
-    renderCards(data.hits);
+    const response = await fetchSearch.fetchSearchImages();
+    renderCards(response.data.hits);
     smoothScroll();
   } catch (error) {
     console.log(error);
