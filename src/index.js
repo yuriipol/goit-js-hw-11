@@ -52,15 +52,20 @@ async function onSearchFormSubmit(event) {
     let totalImages = response.data.totalHits;
     Notiflix.Notify.info(`Hooray! We found ${totalImages} images`);
     //если переменная класса totalHits=null, тогда ей присваеваем значение общего колличества картинок
-    if (fetchSearch.totalHits === null) {
-      fetchSearch.totalHits = response.data.totalHits;
-    }
+
+    fetchSearch.totalHits = response.data.totalHits;
+
     //отрисовываем наши картинки на странице с помощью библиотеки parcel-transformer-hbs
     gallary.innerHTML = templateCard(response.data.hits);
+    if (fetchSearch.isNextDataExsist()) {
+      loadMore.classList.remove('is-hidden');
+    } else {
+      loadMore.classList.add('is-hidden');
+    }
+    console.log(fetchSearch.isNextDataExsist());
     //вызываем библиотеку SimpleLightbox, а на ней метод refresh()
     libraryLithBox.refresh();
     //отображаем кнопку
-    loadMore.classList.remove('is-hidden');
   } catch (error) {
     console.log(error);
   }
