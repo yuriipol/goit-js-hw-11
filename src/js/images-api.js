@@ -11,18 +11,24 @@ export default class FetchSearchImages {
   }
 
   async fetchSearchImages() {
-    const searchParam = new URLSearchParams({
-      image_type: this.photo,
-      orientation: this.horizontal,
-      safesearch: this.true,
-      per_page: this.dataPerPage,
-    });
+    // const searchParam = new URLSearchParams({
+    //   image_type: this.photo,
+    //   orientation: this.horizontal,
+    //   safesearch: this.true,
+    //   per_page: this.dataPerPage,
+    // });
 
-    const request = await axios.get(
-      `${this.#BASE_URL}?key=${this.#API_KEY}&q=${
-        this.searchQuery
-      }&${searchParam}&page=${this.page}`
-    );
+    const request = await axios.get(`${this.#BASE_URL}`, {
+      params: {
+        image_type: this.photo,
+        orientation: this.horizontal,
+        safesearch: this.true,
+        page: this.page,
+        per_page: this.dataPerPage,
+        q: this.searchQuery,
+        key: this.#API_KEY,
+      },
+    });
 
     this.incrementPage();
     return request;
