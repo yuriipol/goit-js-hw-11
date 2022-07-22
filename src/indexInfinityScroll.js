@@ -108,8 +108,6 @@ async function loadMoreData(event) {
     const response = await fetchSearch.fetchSearchImages();
     //рендерим картинки
     renderCards(response.data.hits);
-    //запускаем плавный скролл
-    smoothScroll();
   } catch (error) {
     console.log(error);
   }
